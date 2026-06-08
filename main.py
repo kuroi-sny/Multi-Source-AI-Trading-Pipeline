@@ -11,9 +11,11 @@ from fastapi import WebSocket
 import websockets 
 import json
 
+
+
 ## client = Client() ## Async needs this inside the functions its being used it
 
-## AUTH tools
+## AUTH tools for jwt 
 from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta, timezone
@@ -41,7 +43,7 @@ async def create_user(request:schemas.UserCreate, db: AsyncSession = Depends(get
 @app.post("/login")
 async def login(request: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     
-    #db_user = await db.query(models.User).filter(models.User.username == request.username).first
+    #db_user = await db.query(models.User).filter(models.User.username == request.username).first ## outdated version without async
 
     stmt = select(models.User).filter(models.User.username == request.username)
     result = await db.execute(stmt)

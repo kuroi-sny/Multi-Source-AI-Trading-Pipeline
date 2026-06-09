@@ -21,6 +21,22 @@ services:
     depends_on:
       - db
 
+  redis:
+    image: redis:7
+    ports:
+    - "6379:6379"
+
+  celery_worker:
+    build: .
+    env_file:
+    - .env
+    command: celery -A worker.celery_app worker --loglevel=info
+    depends_on:
+      - db
+      - redis 
+
+
 # Declare the volume at the very bottom
 volumes:
   postgres_data:
+

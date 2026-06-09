@@ -11,6 +11,7 @@ from fastapi import WebSocket
 import websockets 
 import json
 import os
+from worker import execute_trade_strategy
 
 
 
@@ -135,7 +136,9 @@ async def crypto_symbol(crypto: str, current_user: str = Depends(get_current_use
 ## ----------------------------------------------##
 
 
-## Getting historical data out of binance
+## Getting historical data out of binance 
+## CURRENTLY also in worker.py for CELERY to run it in background
+
 @app.get("/history/{crypto}")
 async def get_history(crypto:str, current_user:str = Depends(get_current_user)):
     
@@ -177,7 +180,7 @@ async def get_history(crypto:str, current_user:str = Depends(get_current_user)):
     except BinanceAPIException:
         raise HTTPException(status_code=404, detail = f"{crypto} is the wrong symbol, or the history isnt available")
     
-    finally: await client.close_connection()  ## await Async connection close
+    finally: await client.close_connection()  ## await Async connection close '''
 
 
 
@@ -196,6 +199,20 @@ async def live(websocket: WebSocket, crypto:str ):
 
         async for message in tunnel: 
             await websocket.send_text(message)
+
+
+
+@app.post("/trade/{crypto}")
+async def trigger_trade(crypto: str, current_user: str = Depends(get_current_user)):
+
+    # 1) send ticket to redis mailbox using .delay
+    ## .delay tells it to run in the backrgound (celery)
+    task = execute_trade_strategy.delay(crypto)
+
+    return{
+        "message": f"Trade strategy for {crypto} has been send to the background worker",
+        "task_id": task.id
+    }
   
 
 

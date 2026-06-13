@@ -35,4 +35,7 @@ jobs:
       run: docker compose exec -T web alembic upgrade head
 
     - name: Run Pytest Suite
-      run: docker compose exec -T web pytest
+      run: docker compose exec -T web pytestclear
+
+    - name: Run database Migrations
+      run: docker compose exec -T web python init_db.py

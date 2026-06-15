@@ -230,9 +230,7 @@ async def trigger_trade(request: Request, crypto: str, current_user: str = Depen
     
   
 
+## ----------------------------------------- ## 
 
-
-
-
-
+## 
 

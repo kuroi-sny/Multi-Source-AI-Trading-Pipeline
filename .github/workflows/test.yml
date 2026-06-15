@@ -21,6 +21,7 @@ jobs:
         echo "POSTGRES_PASSWORD=password" >> .env
         echo "POSTGRES_DB=trading_db" >> .env
         echo "SECRET_KEY=supersecret" >> .env
+        echo "GEMINI_API_KEY=dummy_key" >> .env
         echo "JWT_ALGORITHM=HS256" >> .env
         echo "BINANCE_TESTNET_API_KEY=dummy_key" >> .env
         echo "BINANCE_TESTNET_SECRET_KEY=dummy_secret" >> .env

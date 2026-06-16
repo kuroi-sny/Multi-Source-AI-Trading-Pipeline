@@ -21,6 +21,8 @@ import jwt
 from datetime import datetime, timedelta, timezone
 import sys
 from loguru import logger
+from google.genai import types
+from google import genai
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -28,6 +30,7 @@ ALGORITHM = "HS256"
 
 
 app = FastAPI()
+ai_client = genai.Client()
 ## initializing Rate-limiter 
 ## STRICTLY BELOW APP
 limiter = Limiter(key_func=get_remote_address)
@@ -213,6 +216,11 @@ async def live(websocket: WebSocket, crypto:str):
             await websocket.send_text(message)
 
 
+## ----------------------------------------- ##
+
+
+
+## Rate limiter 
 @app.post("/trade/{crypto}")
 @limiter.limit("5/minute") ## Rate limiting decorator
 async def trigger_trade(request: Request, crypto: str, current_user: str = Depends(get_current_user)): 
@@ -232,5 +240,24 @@ async def trigger_trade(request: Request, crypto: str, current_user: str = Depen
 
 ## ----------------------------------------- ## 
 
-## 
+## converting user query into AI embedding and get vectordb
+@app.get("/search")
+async def search(q: str, db: AsyncSession=Depends(get_db)):
+
+    embedded_content = ai_client.models.embed_content(model="gemini-embedding-001", contents=q)
+    query_vector = embedded_content.embeddings[0].values
+
+    stmt = select(models.TradeAnalysis).order_by(models.TradeAnalysis.embedding.cosine_distance(query_vector)).limit(1)
+
+    result = (await db.execute(stmt)).scalars().first()
+
+    if result is not None:
+        return{
+            "symbol": result.symbol,
+            "sentiment":result.sentiment,
+            "reasoning":result.reasoning
+        }
+
+    else: 
+        raise HTTPException(status_code=404, detail="404 Result not found!")
 

@@ -8,6 +8,7 @@ from google import genai
 from database import SessionLocal
 import models
 from google.genai import types
+import json
 
 load_dotenv()
 
@@ -49,13 +50,14 @@ Analyze this cryptocurrency ({crypto_symbol}).
 The recent 10-day closing prices are: {closing_prince_history}. 
 The 5-day SMA is {SMA5} and the 10-day SMA is {SMA10}. 
 Given these quantitative indicators, output a strict trading sentiment (BULLISH, BEARISH, or NEUTRAL) followed by a one-sentence reasoning.
-"""
+You must return the result as a strict JSON object with exactly two keys: "sentiment" and "reasoning"."""
     
-    ai_response = ai_client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+    ai_response = ai_client.models.generate_content(model="gemini-2.5-flash", contents=prompt, config=types.GenerateContentConfig(response_mime_type="application/json"))
 
     ## convert ai_response into text
     ai_text = ai_response.text 
 
+    ai_dict = json.loads(ai_text) ## converting ai_text into dictionary JSON for main.py to give out to /search
     ## embedding content
     embedding_response = ai_client.models.embed_content(model="gemini-embedding-001", contents=ai_text)
 
@@ -71,8 +73,8 @@ Given these quantitative indicators, output a strict trading sentiment (BULLISH,
             new_analysis = models.TradeAnalysis(
                 user_id=1,
                 symbol=crypto_symbol,
-                sentiment="PENDING",
-                reasoning=ai_text,
+                sentiment=ai_dict["sentiment"],
+                reasoning=ai_dict["reasoning"],
                 embedding=vector
             )
             db.add(new_analysis)

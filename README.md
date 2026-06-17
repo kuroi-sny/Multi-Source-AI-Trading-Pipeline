@@ -1,6 +1,7 @@
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-green)
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
+![AWS](https://img.shields.io/badge/AWS-EC2_Deployment-orange)
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-brightgreen)
 ![JWT](https://img.shields.io/badge/Security-JWT_Auth-red)
 

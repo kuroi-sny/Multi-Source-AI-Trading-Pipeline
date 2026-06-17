@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from celery import Celery
 from binance.client import Client
 from google import genai
-from database import SessionLocal
-import models
+from app.db.database import SessionLocal
+from app.db import models
 from google.genai import types
 import json
 

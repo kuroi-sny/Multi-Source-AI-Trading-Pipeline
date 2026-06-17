@@ -1,6 +1,6 @@
 import asyncio
-from database import engine 
-import models
+from app.db.database import engine 
+from app.db import models
 from sqlalchemy import text 
 
 async def init_models():

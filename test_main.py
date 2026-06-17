@@ -1,6 +1,6 @@
 import pytest
 from httpx import AsyncClient, ASGITransport
-from main import app
+from app.main import app
 import uuid
 
 ## mark all tests in this file as async for pytest-asyncio

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float
-from database import Base
+from app.db.database import Base
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import DateTime, ForeignKey
 import datetime

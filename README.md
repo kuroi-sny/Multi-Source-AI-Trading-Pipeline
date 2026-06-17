@@ -5,7 +5,7 @@
 
 # Multi-Source AI Trading & Financial Analysis API
 
-A FastAPI backend that pulls live market data from Binance, runs SMA-based technical analysis, generates AI sentiment using Google Gemini, and stores vectorized embeddings in PostgreSQL (pgvector) for semantic search. The whole stack runs in Docker with Celery handling background tasks.
+A FastAPI backend that pulls live market data from Binance and global sentiment from the Crypto Fear & Greed Index, runs technical analysis, generates AI sentiment using Google Gemini, and stores vectorized embeddings in PostgreSQL (pgvector) for semantic search. The whole stack runs in Docker with Celery handling background tasks.
 
 This project is fully dockerized and utilizes Redis and Celery to process computationally heavy trade analysis tasks asynchronously in the background.
 
@@ -27,7 +27,8 @@ graph TD
     
     %% Background Worker
     Redis -->|Consume Task| Celery[Celery Worker]
-    Celery -->|3. Fetch Historical Data| Binance[Binance API]
+    Celery -->|3a. Fetch Historical Data| Binance[Binance API]
+    Celery -->|3b. Fetch Global Sentiment| FnG[Alternative.me API]
     Celery -->|4. Run Financial Analysis| Gemini[Google Gemini LLM]
     Celery -->|5. Generate Embeddings| GeminiEmbed[Gemini Embeddings API]
     Celery -->|6. Store Vectorized Analysis| DB
@@ -42,6 +43,7 @@ graph TD
 *   **Celery & Redis**: Event-driven background task processing to execute long-running market analysis and AI tasks out-of-band without blocking FastAPI's event loop.
 *   **Google Gemini (GenAI SDK)**: Leveraging `gemini-2.5-flash` for structured sentiment generation and `gemini-embedding-001` for vector embedding generation.
 *   **Binance API**: Dynamic fetching of ticker data, order book, and daily klines (candlesticks).
+*   **Alternative.me API**: Real-time fetching of the Global Crypto Fear & Greed Index for secondary multi-source analysis.
 *   **Alembic**: Database schema migrations for PostgreSQL.
 *   **Docker & Docker Compose**: Orchestrates multi-container services (Web, DB, Redis, Celery Worker).
 *   **SlowAPI**: Rate limiting for DDoS and abuse protection on sensitive endpoints (e.g. trade execution).

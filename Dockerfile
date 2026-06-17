@@ -4,7 +4,7 @@ FROM python:3.12-slim
 # 2) Set the working directory
 WORKDIR /app
 
-# 3) Copy only the requirment file first 
+# 3) Copy the requirment file first 
 # dot at the end tells it to copy it to the current directory
 COPY requirements.txt .
 

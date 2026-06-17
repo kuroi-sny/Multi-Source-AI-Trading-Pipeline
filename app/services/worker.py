@@ -9,6 +9,7 @@ from app.db.database import SessionLocal
 from app.db import models
 from google.genai import types
 import json
+import requests
 
 load_dotenv()
 
@@ -45,11 +46,22 @@ def execute_trade_strategy(crypto_symbol: str):
     SMA10 = sum(closing_prince_history)/10
     SMA5 = sum(closing_prince_history[-5:])/5
 
+    ## Fetch secondary data source (Crypto Fear & Greed Index)
+    try:
+        fng_response = requests.get("https://api.alternative.me/fng/?limit=1", timeout=5)
+        fng_data = fng_response.json()
+        current_fng = fng_data['data'][0]['value']
+        fng_classification = fng_data['data'][0]['value_classification']
+    except Exception:
+        current_fng = "Unknown"
+        fng_classification = "Unknown"
+
     prompt = f"""
 Analyze this cryptocurrency ({crypto_symbol}). 
 The recent 10-day closing prices are: {closing_prince_history}. 
 The 5-day SMA is {SMA5} and the 10-day SMA is {SMA10}. 
-Given these quantitative indicators, output a strict trading sentiment (BULLISH, BEARISH, or NEUTRAL) followed by a one-sentence reasoning.
+The current Global Crypto Fear & Greed Index is {current_fng} ({fng_classification}).
+Given these quantitative indicators and global sentiment, output a strict trading sentiment (BULLISH, BEARISH, or NEUTRAL) followed by a one-sentence reasoning.
 You must return the result as a strict JSON object with exactly two keys: "sentiment" and "reasoning"."""
     
     ai_response = ai_client.models.generate_content(model="gemini-2.5-flash", contents=prompt, config=types.GenerateContentConfig(response_mime_type="application/json"))

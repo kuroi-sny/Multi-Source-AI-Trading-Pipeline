@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-# container 1: the official POSTGRESQL databse
+# container 1: POSTGRESQL databse
   db:
     image: pgvector/pgvector:pg15
     env_file:
@@ -36,7 +36,7 @@ services:
       - redis 
 
 
-# Declare the volume at the very bottom
+
 volumes:
   postgres_data:
 

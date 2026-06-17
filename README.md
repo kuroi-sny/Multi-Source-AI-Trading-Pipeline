@@ -1,3 +1,7 @@
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-async-green)
+![Docker](https://img.shields.io/badge/Docker-Compose-blue)
+
 # Multi-Source AI Trading & Financial Analysis API
 
 A production-grade, asynchronous FastAPI backend that implements a modular architecture to ingest market data from the Binance API, run automated technical indicators (Simple Moving Averages), perform AI-driven sentiment analysis using Google Gemini, store high-dimensional embeddings in PostgreSQL using `pgvector`, and expose the data via semantic vector search.
